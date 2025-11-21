@@ -1,0 +1,40 @@
+/* FULL BLACK PAGE */
+.full-black {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+/* Card fully black */
+.login-card {
+  background: #0a0a0a !important;
+  border: 1px solid #222;
+  color: #fff;
+  border-radius: 8px;
+}
+
+/* Inputs dark mode */
+.dark-input {
+  background: #111 !important;
+  color: #fff !important;
+  border: 1px solid #333 !important;
+}
+
+.dark-input::placeholder {
+  color: #888;
+}
+
+/* Buttons */
+.btn-danger {
+  background: #e53935;
+  border: none;
+}
+
+.btn-outline-light {
+  border-color: #ccc;
+  color: #fff;
+}
+
+.btn-outline-light:hover {
+  background: #333;
+  color: #fff;
+}

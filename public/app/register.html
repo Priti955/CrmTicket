@@ -1,0 +1,191 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>CRM-Ticket Register</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    html,body {
+      height: 100%;
+      background: #000;
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    .page-wrap { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+    .auth-card { width: 900px; max-width: calc(100% - 40px); display: flex; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, #0b0b0b 0%, #0a0a0a 100%); }
+    .auth-left { flex: 1 1 45%; min-height: 360px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015)); display: flex; align-items: center; justify-content: center; padding: 30px; }
+    .auth-left .logo { max-width: 230px; width: 60%; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6)); opacity: 0.98; }
+    .auth-right { flex: 1 1 55%; padding: 44px 48px; color: #fff; background: linear-gradient(180deg, rgba(255,255,255,0.006), rgba(255,255,255,0.01)); }
+    .auth-title { color: #ff3b3b; font-weight: 700; letter-spacing: 1px; font-size: 20px; margin-bottom: 26px; text-transform: uppercase; }
+    .form-label { color: #bdbdbd; font-weight:600; font-size:13px; }
+    .form-control { background: #121212; border: 1px solid #2a2a2a; color: #eee; border-radius: 10px; padding: 12px 14px; box-shadow: none; }
+    .form-control::placeholder { color: #6b6b6b; }
+    .btn-register { background: linear-gradient(180deg,#ff4b4b,#e33c3c); border: none; color: #fff; padding: 12px 18px; border-radius: 10px; font-weight:700; width: 100%; box-shadow: 0 8px 18px rgba(227,60,60,0.14); }
+    .btn-register:active { transform: translateY(1px); }
+    .muted-link { color: #cfcfcf; font-size:14px; }
+    .link-accent { color: #ff6464; font-weight:600; text-decoration:none; }
+    .link-accent:hover { color: #ff8a8a; text-decoration:underline; }
+    .small-help { text-align: center; margin-top: 14px; color: #c9c9c9; font-size:14px; }
+    @media (max-width: 880px) { .auth-card { flex-direction: column; width: 720px; } .auth-left, .auth-right { flex-basis: auto; width: 100%; padding: 28px; } .auth-left { order: 1; } .auth-right { order: 2; } .auth-left .logo { width: 45%; } }
+    .outer-frame { width: 100%; max-width: 1300px; margin: 0 auto; }
+    .error-msg { color:#ff4b4b; font-size:12px; margin-top:4px; display:none; }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="outer-frame">
+      <div class="auth-card">
+        <div class="auth-left">
+          <img class="logo" src="../assets/img/logo.png" alt="logo">
+        </div>
+
+```
+    <div class="auth-right">
+      <div class="auth-title">CRM-TICKET REGISTER</div>
+
+      <form id="registerForm" style="max-width:420px;">
+        <div class="mb-3">
+          <label class="form-label">Full Name</label>
+          <input name="fullname" type="text" class="form-control" placeholder="Enter your full name" required>
+          <div class="error-msg" id="fullnameError"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input name="email" type="email" class="form-control" placeholder="Enter your email" required>
+          <div class="error-msg" id="emailError"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input name="password" type="password" class="form-control" placeholder="Enter your password" required>
+          <div class="error-msg" id="passwordError"></div>
+        </div>
+
+        <div class="mb-3">
+          <button type="submit" class="btn btn-register">Register</button>
+        </div>
+
+        <div class="small-help">
+          <span class="muted-link">Already have an account? </span>
+          <a href="login.html" class="link-accent">Login Here</a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <script>
+(function(){
+  const form = document.getElementById('registerForm');
+  const nameEl = form.querySelector('input[name="fullname"]');
+  const emailEl = form.querySelector('input[name="email"]');
+  const passEl = form.querySelector('input[name="password"]');
+  const fullnameError = document.getElementById('fullnameError');
+  const emailError = document.getElementById('emailError');
+  const passwordError = document.getElementById('passwordError');
+
+  function clearErrors(){
+    [fullnameError,emailError,passwordError].forEach(el=>{
+      el.style.display='none'; el.textContent='';
+    });
+  }
+  function showFieldError(el, msg){ el.textContent = msg; el.style.display='block'; }
+
+  // Auto-determine correct API path relative to this page.
+  // If register.html is at public/app/register.html and API is at public/api/auth.php -> "../api/auth.php"
+  // If register.html is at public/register.html and API is at public/api/auth.php -> "api/auth.php"
+  // If you have a different structure, set apiBase manually below.
+  const apiBase = (function(){
+    // pathParts: e.g. "/crm-ticket/public/app/register.html" -> ["","crm-ticket","public","app","register.html"]
+    const parts = location.pathname.split('/');
+    // if the path contains "app" folder, go up one level to public
+    if (parts.includes('app')) {
+      return '../api/auth.php?action=register';
+    }
+    // else assume register.html lives in public/
+    return 'api/auth.php?action=register';
+  })();
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    clearErrors();
+
+    const name = nameEl.value.trim();
+    const email = emailEl.value.trim();
+    const password = passEl.value;
+
+    // basic client-side validation
+    let ok = true;
+    if (!name || name.length < 2) { showFieldError(fullnameError, 'Enter full name (min 2 chars)'); ok=false; }
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) { showFieldError(emailError, 'Enter a valid email'); ok=false; }
+    if (!password || password.length < 8) { showFieldError(passwordError, 'Password must be at least 8 characters'); ok=false; }
+    if (!ok) return;
+
+    // Build payload
+    const payload = { name, email, password };
+
+    try {
+      const resp = await fetch(apiBase, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+
+      // network-level OK? Otherwise parse JSON if any
+      let json = null;
+      try { json = await resp.json(); } catch (parseErr) {
+        console.error('Response was not JSON', parseErr);
+      }
+
+      // If not OK, show server-provided message if available, else generic
+      if (!resp.ok) {
+        console.warn('Server responded with non-OK status', resp.status, json);
+        if (json && json.error) {
+          // json.error may be string or object of field errors
+          if (typeof json.error === 'object') {
+            if (json.error.name) showFieldError(fullnameError, json.error.name);
+            if (json.error.email) showFieldError(emailError, json.error.email);
+            if (json.error.password) showFieldError(passwordError, json.error.password);
+          } else {
+            showFieldError(emailError, json.error);
+          }
+        } else {
+          showFieldError(emailError, 'Registration failed (status ' + resp.status + '). Check server logs.');
+        }
+        return;
+      }
+
+      // Success: server might return { success:true } or user object
+      if (json && (json.success || json.user)) {
+        // Redirect to dashboard, adjust relative path if needed:
+        // If register is in public/app/, dashboard at ../app/dashboard.html -> we want '../app/dashboard.html'
+        // We'll assume dashboard.html sits in the same folder as register (app/)
+        const dashboardPath = (location.pathname.includes('/app/')) ? 'dashboard.html' : 'app/dashboard.html';
+        window.location.href = dashboardPath;
+      } else {
+        // fallback: if server returned no JSON success flag, just go to dashboard
+        window.location.href = (location.pathname.includes('/app/')) ? 'dashboard.html' : 'app/dashboard.html';
+      }
+
+    } catch (err) {
+      console.error('Fetch failed', err);
+      // Common reasons: wrong URL, CORS, server down
+      showFieldError(emailError, 'Network error: could not reach server. Check API path and server (see console).');
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

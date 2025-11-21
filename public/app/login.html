@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>CRM-Ticket Login</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom styles -->
+  <style>
+    /* Page background - full black */
+    html,body {
+      height: 100%;
+      background: #000;
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* center container */
+    .page-wrap {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* Card */
+    .auth-card {
+      width: 900px;
+      max-width: calc(100% - 40px);
+      display: flex;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.03);
+      background: linear-gradient(180deg, #0b0b0b 0%, #0a0a0a 100%);
+    }
+
+    /* left area (logo) */
+    .auth-left {
+      flex: 1 1 45%;
+      min-height: 360px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+    .auth-left .logo {
+      max-width: 230px;
+      width: 60%;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6));
+      opacity: 0.98;
+    }
+
+    /* right area (form) */
+    .auth-right {
+      flex: 1 1 55%;
+      padding: 44px 48px;
+      color: #fff;
+      background: linear-gradient(180deg, rgba(255,255,255,0.006), rgba(255,255,255,0.01));
+    }
+
+    .auth-title {
+      color: #ff3b3b; /* red accent */
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 20px;
+      margin-bottom: 26px;
+      text-transform: uppercase;
+    }
+
+    .form-label { color: #bdbdbd; font-weight:600; font-size:13px; }
+    .form-control {
+      background: #121212;
+      border: 1px solid #2a2a2a;
+      color: #eee;
+      border-radius: 10px;
+      padding: 12px 14px;
+      box-shadow: none;
+    }
+    .form-control::placeholder { color: #6b6b6b; }
+
+    .btn-login {
+      background: linear-gradient(180deg,#ff4b4b,#e33c3c);
+      border: none;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight:700;
+      width: 100%;
+      box-shadow: 0 8px 18px rgba(227,60,60,0.14);
+    }
+    .btn-login:active { transform: translateY(1px); }
+
+    .muted-link { color: #cfcfcf; font-size:14px; }
+    .link-accent { color: #ff6464; font-weight:600; text-decoration:none; }
+    .link-accent:hover { color: #ff8a8a; text-decoration:underline; }
+
+    /* small text under button */
+    .small-help { text-align: center; margin-top: 14px; color: #c9c9c9; font-size:14px; }
+
+    /* responsive: stack */
+    @media (max-width: 880px) {
+      .auth-card { flex-direction: column; width: 720px; }
+      .auth-left, .auth-right { flex-basis: auto; width: 100%; padding: 28px; }
+      .auth-left { order: 1; }
+      .auth-right { order: 2; }
+      .auth-left .logo { width: 45%; }
+    }
+
+    /* make the container appear visually centered like screenshot */
+    .outer-frame {
+      width: 100%;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="outer-frame">
+      <div class="auth-card">
+        <div class="auth-left">
+ 
+       <img class="logo" src="../assets/img/logo.png" alt="logo">
+
+        </div>
+
+        <div class="auth-right">
+          <div class="auth-title">CRM-TICKET LOGIN</div>
+
+          <form id="loginForm" style="max-width:420px;">
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input name="email" type="email" class="form-control" placeholder="Enter your email" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input name="password" type="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+
+            <div class="mb-3">
+              <button type="submit" class="btn btn-login">Login</button>
+            </div>
+
+            <div class="small-help">
+              <span class="muted-link">New User? </span>
+              <a href="register.html" class="link-accent">Register Here</a>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional JS: submits to your auth endpoint -->
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e){
+      e.preventDefault();
+      const f = new FormData(e.target);
+      const payload = { email: f.get('email'), password: f.get('password') };
+
+      try {
+        const resp = await fetch('/api/auth.php?action=login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+        const json = await resp.json();
+        if (json.error) {
+          alert(json.error);
+        } else {
+          // on success: go to dashboard
+          window.location.href = '/public/app/dashboard.html';
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Network error');
+      }
+    });
+  </script>
+</body>
+</html>
